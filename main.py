@@ -18,16 +18,16 @@ class InputData(BaseModel):
 class PredictionResult(BaseModel):
     predicted_label: int
 
-# Load the model
 def load_model():
     model_path = "model.h5"
     if not os.path.exists(model_path):
         raise FileNotFoundError("Model file not found.")
     
     with h5py.File(model_path, 'r') as file:
-        model = file['model'][:]
-    
+        model = file['model'][()]  # Load the single value
+        
     return model
+
 
 loaded_model = load_model()
 
