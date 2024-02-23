@@ -18,7 +18,7 @@ class PredictionResult(BaseModel):
     predicted_label: int
 
 # Load the trained KNN model
-with open('knn_model.pkl', 'rb') as file:
+with open('knn_classifier.pkl', 'rb') as file:
     loaded_model = pickle.load(file)
 
 # Define the endpoint
