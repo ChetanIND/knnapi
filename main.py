@@ -2,7 +2,8 @@ from fastapi import FastAPI, Query
 from pydantic import BaseModel
 from typing import List
 import numpy as np
-import joblib
+import h5py
+import os
 
 # Define the FastAPI app
 app = FastAPI()
@@ -17,14 +18,26 @@ class InputData(BaseModel):
 class PredictionResult(BaseModel):
     predicted_label: int
 
-loaded_model = joblib.load("knn_classifier.pkl")
+# Load the model
+def load_model():
+    model_path = "model.h5"
+    if not os.path.exists(model_path):
+        raise FileNotFoundError("Model file not found.")
+    
+    with h5py.File(model_path, 'r') as file:
+        model = file['model'][:]
+    
+    return model
+
+loaded_model = load_model()
+
 # Define the endpoint
 @app.get("/classify/", response_model=PredictionResult)
 async def classify(Food: float = Query(..., description="Value of Food field"),
                    Healthcare: float = Query(..., description="Value of Healthcare field"),
                    Fashion: float = Query(..., description="Value of Fashion field")):
     
-    # Classify the new point using the loaded KNN model
+    # Classify the new point using the loaded model
     predicted_label = loaded_model.predict(np.array([[Food, Healthcare, Fashion]]))
     
     return {"predicted_label": predicted_label[0]}
