@@ -2,7 +2,7 @@ from fastapi import FastAPI, Query
 from pydantic import BaseModel
 from typing import List
 import numpy as np
-import pickle
+import joblib
 
 # Define the FastAPI app
 app = FastAPI()
@@ -17,10 +17,7 @@ class InputData(BaseModel):
 class PredictionResult(BaseModel):
     predicted_label: int
 
-# Load the trained KNN model
-with open('knn_classifier.pkl', 'rb') as file:
-    loaded_model = pickle.load(file)
-
+loaded_model = joblib.load("knn_classifier.pkl")
 # Define the endpoint
 @app.get("/classify/", response_model=PredictionResult)
 async def classify(Food: float = Query(..., description="Value of Food field"),
